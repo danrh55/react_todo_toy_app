@@ -1,12 +1,11 @@
-import { useContext } from "react";
-import { Todo } from "../../types/todos";
-import { TodosContext } from "../../App";
+import Todo from "../../models/todo";
 import fetchTodos from "../../services/api";
-import { TodoListsContainer } from "../../types/lists";
+import TodoListsContainer from "../../models/todoListsContainer";
 import { type MouseEvent } from "react";
+import { useTodoLists } from "../providers/todoListsProvider";
 
 function TodoItem(props: { todo: Todo }) {
-  const { setTodoLists } = useContext(TodosContext);
+  const { setTodoLists } = useTodoLists()
   const { todo } = props;
   const { id, dueDate, title } = todo;
   
@@ -17,6 +16,7 @@ function TodoItem(props: { todo: Todo }) {
     });
 
     if (response.ok) {
+      // don't like i have to rememeber to create new todolistcontainer object
       setTodoLists(new TodoListsContainer(await fetchTodos()));
     } else {
       alert(`Failed to delete todo! ${response.status}`);

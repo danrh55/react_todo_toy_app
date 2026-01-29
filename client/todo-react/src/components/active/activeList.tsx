@@ -1,13 +1,13 @@
-import { useContext } from "react";
-import { SelectedContext, TodosContext } from "../../App";
 import DueDateHeader from "./dueDateHeader";
 import AddTodoButton from "./addTodo";
 import Modal from "../modal/modal";
 import TodoItem from "./todo";
+import { useSelected } from "../providers/selectedProvider";
+import { useTodoLists } from "../providers/todoListsProvider";
  
 function ActiveList() {
-  const { selected } = useContext(SelectedContext);
-  const { todoLists } = useContext(TodosContext);
+  const { selected } = useSelected();
+  const { todoLists } = useTodoLists();
   let activeTodos = todoLists.getList(selected);
   
   return (
@@ -15,7 +15,7 @@ function ActiveList() {
       <DueDateHeader title={selected.listName} numTodos={activeTodos.length}></DueDateHeader>
       <main>
         <AddTodoButton></AddTodoButton>
-        <table border-spacing={0}>
+        <table style={{ borderSpacing: 0 }}>
           <tbody>
             { 
               activeTodos.map((todo) => {

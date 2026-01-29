@@ -1,12 +1,11 @@
 import CategoryHeader from "./categoryHeader";
 import DueDate from "./dueDate";
-import { type Category } from "../../types/lists";
-import { useContext } from "react";
-import { TodosContext } from "../../App";
+import { type Category } from "../../types/todos";
+import { useTodoLists } from "../providers/todoListsProvider";
 
 function CategoryList(props: { category: Category }) {
   const { category } = props;
-  const { todoLists } = useContext(TodosContext);
+  const { todoLists } = useTodoLists();
   const todos = todoLists.getList({ category: category, listName: category });
   // friction from separating category list vs duedate list
   return (

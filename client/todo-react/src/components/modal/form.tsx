@@ -1,26 +1,27 @@
 import SelectDate from "./selectDate";
-import { type ModalInputs } from "../../types/modal";
-import { TodosContext } from "../../App";
-import { useContext } from "react";
+import { type ModalInputs } from "../../types/todos";
 import fetchTodos from "../../services/api";
-import { TodoListsContainer } from "../../types/lists";
+import TodoListsContainer from "../../models/todoListsContainer"
 import { type FormEvent } from "react";
+import { useTodoLists } from "../providers/todoListsProvider";
 
-function ModalForm(props: { hideModal: Function }) {
-  const { setTodoLists } = useContext(TodosContext);
+function ModalForm(props: { hideModal: () => void }) {
+  const { setTodoLists } = useTodoLists();
 
-  function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
-    const inputs = Object.fromEntries(new FormData(form).entries());
-    
-    // fix this later with types.
+
     const data: ModalInputs = {
-      ...inputs,
-      title: inputs.todoTitle,
-    }
-    delete data.todoTitle;
-    const id = form.dataset.id
+      title: (form.elements.namedItem('todoTitle') as HTMLInputElement | null)?.value ?? '',
+      day: (form.elements.namedItem('day') as HTMLSelectElement | null)?.value ?? 'dy',
+      month: (form.elements.namedItem('month') as HTMLSelectElement | null)?.value ?? 'mt',
+      year: (form.elements.namedItem('year') as HTMLSelectElement | null)?.value ?? 'year',
+      description: (form.elements.namedItem('description') as HTMLTextAreaElement | null)?.value ?? '',
+      completed: false,
+    };
+
+    const id = form.dataset.id;
   
     if (id) {
       updateTodo(data, id);
@@ -53,7 +54,7 @@ function ModalForm(props: { hideModal: Function }) {
     }
   }
 
-  async function updateTodo(data: ModalInputs, id: number) {
+  async function updateTodo(data: ModalInputs, id: string) {
     if (data.month === 'mt' || data.year === 'year') { 
       data.day = 'dy';
     }
@@ -77,14 +78,15 @@ function ModalForm(props: { hideModal: Function }) {
   }
 
   async function markAsComplete() {
-    let form = document.querySelector('form');
-    let todoId;
+    const form = document.querySelector('#form_modal form') as HTMLFormElement | null;
+    let todoId: string | undefined;
 
     if (form) {
-      todoId = form.dataset.id
+      todoId = form.dataset.id;
     }
 
     try {
+      if (!todoId) throw new Error('Missing todo id');
       let json = JSON.stringify({ completed: true });
 
       let response = await fetch(`/api/todos/${todoId}`, {
@@ -107,7 +109,7 @@ function ModalForm(props: { hideModal: Function }) {
   }
 
   return (
-    <form action="" method="post" onSubmit={(e) => handleSubmit(e)}>
+    <form action="" method="post" onSubmit={handleSubmit}>
       <fieldset>
         <ul>
           <li>

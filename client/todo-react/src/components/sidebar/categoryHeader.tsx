@@ -1,11 +1,10 @@
-import { type Category } from "../../types/lists";
-import { useContext } from "react";
-import { SelectedContext } from "../../App";
+import { type Category } from "../../types/todos";
 import { capitalize } from 'lodash';
+import { useSelected } from "../providers/selectedProvider";
 
 function CategoryHeader(props: { category: Category; numTodos: number }) {
   const { category, numTodos } = props;
-  const { selected, setSelected } = useContext(SelectedContext);
+  const { selected, setSelected } = useSelected();
   const title = category === 'completed' ? category : `${category} Todos`;
   const className = (selected.category === category && selected.listName === category) ? 'active': '';
   const listName = category;
